@@ -13,6 +13,7 @@ import truncate from 'truncate'
 import { updateSearchQueries } from '../../lib/location/updateQueryString'
 import moment from 'moment/moment'
 import Pagination from '../../components/Pagination'
+import { withRouter } from 'react-router-dom'
 
 const pollsQuery = gql`
   query getPolls ($token: String!, $body: PollFindParams!){
@@ -103,7 +104,7 @@ class Polls extends Component {
   
   onFilterInput = (key, event) => {
     let value
-    if (key === 'createdDate') {
+    if (key === 'createdDate' || key === 'updatedDate') {
       value = event ? new Date(event).toISOString() : ''
     } else {
       value = event.target.value
@@ -146,6 +147,10 @@ class Polls extends Component {
   }
   
   onPollClick = (id) => {
+    this.props.history.push(`/admin/polls/${id}`)
+  }
+  
+  onPollUpdateActionClick = (id) => {
     this.setState({
       updatePoll: {
         ...this.state.updatePoll,
@@ -256,15 +261,15 @@ class Polls extends Component {
     const $trows = this.state.filtered.map(poll => {
       return (
         <tr key={poll.id}>
-          <td>{truncate(poll.name, 20)}</td>
-          <td>{poll.entities.totalResults}</td>
-          <td>{moment(poll.createdDate).format('MM/DD/YY HH:mm:ss')}</td>
-          <td>{moment(poll.updatedDate).format('MM/DD/YY HH:mm:ss')}</td>
+          <td onClick={this.onPollClick.bind(this, poll.id)}>{truncate(poll.name, 20)}</td>
+          <td onClick={this.onPollClick.bind(this, poll.id)}>{poll.entities.totalResults}</td>
+          <td onClick={this.onPollClick.bind(this, poll.id)}>{moment(poll.createdDate).format('MM/DD/YY HH:mm:ss')}</td>
+          <td onClick={this.onPollClick.bind(this, poll.id)}>{moment(poll.updatedDate).format('MM/DD/YY HH:mm:ss')}</td>
           <td>
             <Button
               className="pt-button pt-small"
               text="Update"
-              onClick={this.onPollClick.bind(this, poll.id)}/>
+              onClick={this.onPollUpdateActionClick.bind(this, poll.id)}/>
           </td>
         </tr>
       )
@@ -326,6 +331,7 @@ class Polls extends Component {
 }
 
 export default compose(
+  withRouter,
   withProps(() => {
     return {
       getPollsQueryVariables: () => {

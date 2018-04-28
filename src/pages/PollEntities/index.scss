@@ -1,0 +1,28 @@
+.PollEntities {
+  .table {
+    width: 100%;
+    // date-input does not display correctly without min-height
+    min-height: 500px;
+    max-width: 100%;
+    overflow-x: scroll;
+    table {
+      min-width: 100%;
+      th {
+        min-width: 200px;
+      }
+    }
+  }
+
+  .poll-heading {
+    font-family: CircularStd, serif;
+    margin: 15px 0;
+  }
+
+  th > label {
+    margin-bottom: 0;
+  }
+
+  .pt-tag {
+    margin-right: 5px;
+  }
+}
