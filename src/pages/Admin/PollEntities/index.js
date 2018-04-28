@@ -10,9 +10,9 @@ import { compose, withProps, branch, renderComponent } from 'recompose'
 import fuzzy from 'fuzzy'
 import EntityPublish from '../EntityPublish'
 import truncate from 'truncate'
-import { updateSearchQueries } from '../../lib/location/updateQueryString'
+import { updateSearchQueries } from '../../../lib/location/updateQueryString'
 import moment from 'moment/moment'
-import Pagination from '../../components/Pagination'
+import Pagination from '../../../components/Pagination'
 import { withRouter } from 'react-router-dom'
 
 const pollQuery = gql`

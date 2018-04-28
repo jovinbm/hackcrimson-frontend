@@ -6,21 +6,21 @@ import gql from 'graphql-tag'
 import { graphql } from 'react-apollo'
 import { compose, withProps, renderComponent, branch } from 'recompose'
 import shallowEqual from 'shallowequal'
-import * as toaster from '../../lib/toaster'
+import * as toaster from '../../../lib/toaster'
 
 class Root extends Component {
   render() {
     return (
-      <div className="PollPublish">
+      <div className="EntityPublish">
         {this.props.children}
       </div>
     )
   }
 }
 
-const pollQuery = gql`
-  query getPoll ($token: String!, $id: MongooseObjectId!){
-    poll(token: $token, id: $id){
+const entityQuery = gql`
+  query getEntity ($token: String!, $id: MongooseObjectId!){
+    entity(token: $token, id: $id){
       id,
       name,
       description,
@@ -28,9 +28,9 @@ const pollQuery = gql`
   }
 `
 
-const createPollMutation = gql`
-  mutation createPoll($token: String!, $body: pollCreateBody!){
-    pollCreate(token: $token, body: $body){
+const createEntityMutation = gql`
+  mutation createEntity($token: String!, $body: entityCreateBody!){
+    entityCreate(token: $token, body: $body){
       id,
       name,
       description,
@@ -38,9 +38,9 @@ const createPollMutation = gql`
   }
 `
 
-const updatePollMutation = gql`
-  mutation updatePoll($token: String!, $body: pollUpdateBody!){
-    pollUpdate(token: $token, body: $body){
+const updateEntityMutation = gql`
+  mutation updateEntity($token: String!, $body: entityUpdateBody!){
+    entityUpdate(token: $token, body: $body){
       id,
       name,
       description,
@@ -48,25 +48,26 @@ const updatePollMutation = gql`
   }
 `
 
-const deletePollMutation = gql`
-  mutation deletePoll($token: String!, $body: pollDeleteBody!){
-    pollDelete(token: $token, body: $body){
+const deleteEntityMutation = gql`
+  mutation deleteEntity($token: String!, $body: entityDeleteBody!){
+    entityDelete(token: $token, body: $body){
       id,
     }
   }
 `
 
-class PollPublish extends Component {
+class EntityPublish extends Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'update']).isRequired,
+    pollId: PropTypes.string.isRequired,
     id: function(props, propName, componentName) {
       if (props.action === 'update' && !props[propName]) {
         return new Error(`Invalid prop ${propName} supplied to ${componentName}. ${propName} required during update.`)
       }
     },
-    pollData: PropTypes.object,
-    createPoll: PropTypes.func,
-    updatePoll: PropTypes.func,
+    entityData: PropTypes.object,
+    createEntity: PropTypes.func,
+    updateEntity: PropTypes.func,
     // when onCancel is provided, the component will show the cancel button
     onCancel: PropTypes.func,
     onDelete: function(props, propName, componentName) {
@@ -87,41 +88,42 @@ class PollPublish extends Component {
     this.setState({busy: status})
   }
   
-  createPoll = async(event) => {
+  createEntity = async(event) => {
     this.busy(true)
     event.preventDefault()
     try {
       toaster.info({
-        message: 'Creating poll...',
+        message: 'Creating entity...',
       })
-      const {data: {pollCreate: poll}} = await this.props.createPoll({
+      const {data: {entityCreate: entity}} = await this.props.createEntity({
         variables: {
           token: 'abcde',
           body: {
             name: this.state.name,
             description: this.state.description,
+            pollId: this.props.pollId,
           },
         },
       })
       toaster.success({
-        message: 'Poll created!',
+        message: 'Entity created!',
       })
       this.busy(false)
-      await this.props.onSubmit(poll.id)
+      await this.props.onSubmit(entity.id)
     } catch (e) {
       this.busy(false)
       console.error(e)
     }
   }
   
-  updatePoll = async(event) => {
+  updateEntity = async(event) => {
     event.preventDefault()
     this.busy(true)
     try {
       toaster.info({
-        message: 'Updating poll...',
+        message: 'Updating entity...',
       })
-      const {data: {pollUpdate: poll}} = await this.props.updatePoll({
+      const {data: {entityUpdate: entity}} = await this.props.updateEntity({
         variables: {
           token: 'abcde',
           body: {
@@ -132,24 +134,24 @@ class PollPublish extends Component {
         },
       })
       toaster.success({
-        message: 'Poll updated!',
+        message: 'Entity updated!',
       })
       this.busy(false)
-      await this.props.onSubmit(poll.id)
+      await this.props.onSubmit(entity.id)
     } catch (e) {
       this.busy(false)
       console.error(e)
     }
   }
   
-  deletePoll = async(event) => {
+  deleteEntity = async(event) => {
     event.preventDefault()
     this.busy(true)
     try {
       toaster.info({
-        message: 'Deleting poll...',
+        message: 'Deleting entity...',
       })
-      await this.props.deletePoll({
+      await this.props.deleteEntity({
         variables: {
           token: 'abcde',
           body: {
@@ -158,7 +160,7 @@ class PollPublish extends Component {
         },
       })
       toaster.success({
-        message: 'Poll deleted!',
+        message: 'Entity deleted!',
       })
       this.busy(false)
       await this.props.onDelete()
@@ -182,28 +184,28 @@ class PollPublish extends Component {
   
   UNSAFE_componentWillReceiveProps(nextProps) {
     // if this is an update action, then we will
-    // be waiting for the poll to come from the server
+    // be waiting for the entity to come from the server
     // when it comes back, update state
     if (nextProps.action === 'update') {
-      const nextPoll = nextProps.pollData.poll
-      const thisPoll = this.props.pollData.poll
-      if (!shallowEqual(nextPoll, thisPoll)) {
+      const nextEntity = nextProps.entityData.entity
+      const thisEntity = this.props.entityData.entity
+      if (!shallowEqual(nextEntity, thisEntity)) {
         this.setState({
-          name: nextPoll.name || '',
-          dorm: nextPoll.description || '',
+          name: nextEntity.name || '',
+          dorm: nextEntity.description || '',
         })
       }
     }
   }
   
   componentDidMount() {
-    // if update, set poll details in state
+    // if update, set entity details in state
     if (this.props.action === 'update') {
-      const thisPoll = this.props.pollData.poll
-      if (thisPoll) {
+      const thisEntity = this.props.entityData.entity
+      if (thisEntity) {
         this.setState({
-          name: thisPoll.name || '',
-          description: thisPoll.description || '',
+          name: thisEntity.name || '',
+          description: thisEntity.description || '',
         })
       }
     }
@@ -212,7 +214,7 @@ class PollPublish extends Component {
   render() {
     const $body =
       <div>
-        <form id="pollPublish" onSubmit={this.createPoll}>
+        <form id="entityPublish" onSubmit={this.createEntity}>
           <label className="pt-label">
             Name
             <span className="pt-text-muted"> (required)</span>
@@ -248,13 +250,13 @@ class PollPublish extends Component {
         className={'pt-button pt-intent-danger'}
         content={
           <React.Fragment>
-            <p>You are about to delete this poll!</p>
+            <p>You are about to delete this entity!</p>
             <Button
               className="pt-button pt-fill"
               intent={Intent.DANGER}
               text="Confirm Delete"
               disabled={this.state.busy}
-              onClick={this.deletePoll}/>
+              onClick={this.deleteEntity}/>
           </React.Fragment>
         }
         target={
@@ -271,15 +273,15 @@ class PollPublish extends Component {
         className={'pt-button pt-intent-primary'}
         content={
           <React.Fragment>
-            <p>You are about to save this poll!</p>
+            <p>You are about to save this entity!</p>
             <Button
               className="pt-button pt-fill"
               intent={Intent.PRIMARY}
               text={this.props.action === 'create' ? 'Confirm Create' : 'Confirm Update'}
               disabled={this.state.busy}
               type="submit"
-              form="pollPublish"
-              onClick={this.props.action === 'create' ? this.createPoll : this.updatePoll}/>
+              form="entityPublish"
+              onClick={this.props.action === 'create' ? this.createEntity : this.updateEntity}/>
           </React.Fragment>
         }
         target={
@@ -303,9 +305,9 @@ class PollPublish extends Component {
 }
 
 export default compose(
-  graphql(pollQuery, {
+  graphql(entityQuery, {
     fetchPolicy: 'cache-and-network',
-    name: 'pollData',
+    name: 'entityData',
     skip: props => props.action === 'create',
     options: (props) => {
       return {
@@ -316,31 +318,31 @@ export default compose(
       }
     },
   }),
-  graphql(createPollMutation, {
-    name: 'createPollMutation',
+  graphql(createEntityMutation, {
+    name: 'createEntityMutation',
   }),
-  graphql(updatePollMutation, {
-    name: 'updatePollMutation',
+  graphql(updateEntityMutation, {
+    name: 'updateEntityMutation',
   }),
-  graphql(deletePollMutation, {
-    name: 'deletePollMutation',
+  graphql(deleteEntityMutation, {
+    name: 'deleteEntityMutation',
   }),
   withProps(props => {
     return {
-      createPoll: async(...args) => {
-        return props.createPollMutation(...args)
+      createEntity: async(...args) => {
+        return props.createEntityMutation(...args)
       },
-      updatePoll: async(...args) => {
-        return props.updatePollMutation(...args)
+      updateEntity: async(...args) => {
+        return props.updateEntityMutation(...args)
       },
-      deletePoll: async(...args) => {
-        return props.deletePollMutation(...args)
+      deleteEntity: async(...args) => {
+        return props.deleteEntityMutation(...args)
       },
     }
   }),
   branch(
     (props) => {
-      return props.action === 'update' && props.pollData.loading
+      return props.action === 'update' && props.entityData.loading
     },
     renderComponent(() => {
       return <Root>
@@ -352,12 +354,12 @@ export default compose(
   ),
   branch(
     (props) => {
-      return props.action === 'update' && !props.pollData.poll
+      return props.action === 'update' && !props.entityData.entity
     },
     renderComponent((props) => {
       return <Root>
-        <NonIdealState title={'Poll not found'}
-                       description={`Poll with id ${props.id} not found`}
+        <NonIdealState title={'Entity not found'}
+                       description={`Entity with id ${props.id} not found`}
                        visual={'graph-remove'}
                        action={
                          <Button
@@ -368,4 +370,4 @@ export default compose(
       </Root>
     })
   ),
-)(PollPublish)
+)(EntityPublish)
