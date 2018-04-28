@@ -25,7 +25,10 @@ const pollQuery = gql`
           name,
           description,
           createdDate,
-          updatedDate
+          updatedDate,
+          votes {
+            totalResults
+          }
         }
       }
       createdDate,
@@ -39,7 +42,6 @@ class Poll extends Component {
     // id is the id of the poll
     poll: PropTypes.object,
     refetchPoll: PropTypes.func.isRequired,
-    data: PropTypes.object.isRequired,
   }
   
   state = {
