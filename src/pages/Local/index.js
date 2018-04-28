@@ -2,26 +2,26 @@ import React, { Component } from 'react'
 import './index.css'
 import { Tab, Tabs } from '@blueprintjs/core'
 import Polls from './Polls'
-import PollEntities from './PollEntities'
+import Poll from './Poll'
 import { Switch, Route } from 'react-router-dom'
 import RedirectWithStatus from '../../components/RedirectWithStatus'
 import RouteNotFound from '../../components/RouteNotFound'
 import { withRouter } from 'react-router-dom'
 import { compose } from 'recompose'
 
-class Admin extends Component {
+class Local extends Component {
   state = {
-    tab: this.props.match.params.adminTab,
+    tab: this.props.match.params.localTab,
   }
   
   handleTabChange = (tab) => {
     this.setState({tab})
-    this.props.history.push(`/admin/${tab}`)
+    this.props.history.push(`/local/${tab}`)
   }
   
   render() {
     return (
-      <div className="Admin">
+      <div className="Local">
         <div className={'tabDiv'}>
           <Tabs id="tabs" onChange={this.handleTabChange} selectedTabId={this.state.tab} large={true}>
             <Tab id="polls" title="Polls"/>
@@ -29,9 +29,9 @@ class Admin extends Component {
           </Tabs>
         </div>
         <Switch>
-          <Route exact path="/admin/polls" component={Polls}/>
-          <Route exact path="/admin/polls/:pollId" component={PollEntities}/>
-          <RedirectWithStatus from={'/admin'} to={'/admin/polls'} status={301}/>
+          <Route exact path="/local/polls" component={Polls}/>
+          <Route exact path="/local/polls/:pollId" component={Poll}/>
+          <RedirectWithStatus from={'/local'} to={'/local/polls'} status={301}/>
           <Route component={RouteNotFound}/>
         </Switch>
       </div>
@@ -40,4 +40,4 @@ class Admin extends Component {
   }
 }
 
-export default compose(withRouter)(Admin)
+export default compose(withRouter)(Local)
