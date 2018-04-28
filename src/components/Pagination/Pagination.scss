@@ -1,0 +1,8 @@
+@import '../../css/core.scss';
+
+.Pagination {
+  margin: 15px 0;
+  button.active {
+    background-color: $pt-intent-primary;
+  }
+}

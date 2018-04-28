@@ -1,0 +1,28 @@
+/* stylelint-disable color-named*/
+$green-primary: #3ac47a;
+$green-primary-lightened: lighten($green-primary, 30);
+$green-primary-darkened: darken($green-primary, 10);
+$green-primary-hover: lighten($green-primary, 10);
+$green-primary-active: darken($green-primary, 5);
+$green-washed: #80e194;
+$pale-green: #ddffec;
+$light-forest-green: #4a8d69;
+$darkish-pink: #e0346a;
+$darkish-pink-hover: #b31a4a;
+$darkish-pink-active: $darkish-pink;
+$gray: #9b9b9b;
+$gray-hover: #f3f3f3;
+$gray-active: lighten($gray, 20);
+$gray-light: #f5f5f5;
+$gray-dark: #dddddd;
+$gray-dark-hover: darken($gray-dark, 15);
+$gray-dark-active: darken($gray-dark, 5);
+$grayish-brown: #4a4a4a;
+$gray-dark-darkened: darken($gray-dark, 10);
+$slate: #606060;
+$white: #ffffff;
+$black: #000000;
+$red: #e0346a;
+$red-hover: lighten($red, 10);
+$red-active: darken($red, 5);
+$yellow: #f4c542;

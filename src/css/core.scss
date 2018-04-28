@@ -1,0 +1,8 @@
+@import './colors.scss';
+@import './typefaces.scss';
+@import '../../node_modules/@blueprintjs/core/src/blueprint.scss';
+
+* {
+  box-sizing: border-box;
+  font-family: CircularStd, serif;
+}
