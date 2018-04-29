@@ -6,6 +6,7 @@ import gql from 'graphql-tag'
 import { graphql } from 'react-apollo'
 import { compose, withProps, branch, renderComponent } from 'recompose'
 import { withRouter } from 'react-router-dom'
+import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, Pie, PieChart } from 'recharts'
 
 const pollQuery = gql`
   query getPoll ($token: String!, $id: MongooseObjectId!, $page: Int, $quantity: Int){
@@ -37,6 +38,14 @@ const pollQuery = gql`
   }
 `
 
+const pollSubscription = gql`
+  subscription onPollVote {
+    pollVote {
+      status
+    }
+  }
+`
+
 class Poll extends Component {
   static propTypes = {
     // id is the id of the poll
@@ -57,6 +66,7 @@ class Poll extends Component {
   }
   
   componentDidMount() {
+    this.props.pollData.startPolling(500)
     this.setState({
       data: this.props.data,
     })
@@ -74,10 +84,20 @@ class Poll extends Component {
           </div>
         </div>
     } else {
+      const data = this.props.poll.entities.items.map(entity => {
+        return {
+          name: entity.name.split(' ')[0].toLowerCase(),
+          value: entity.votes.totalResults,
+        }
+      })
+      console.log(data)
       $elem =
         <React.Fragment>
           <h1 className={'poll-heading'}>{this.props.poll.name}</h1>
-          <p>Graph Will Be Displayed Here</p>
+          <PieChart width={730} height={250}>
+            <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={50} fill="#8884d8"/>
+            <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} fill="#82ca9d" label/>
+          </PieChart>
         </React.Fragment>
       
     }
