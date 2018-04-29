@@ -90,7 +90,6 @@ class Poll extends Component {
           value: entity.votes.totalResults,
         }
       })
-      console.log(data)
       $elem =
         <React.Fragment>
           <h1 className={'poll-heading'}>{this.props.poll.name}</h1>
